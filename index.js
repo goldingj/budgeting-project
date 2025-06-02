@@ -33,21 +33,20 @@ app.get('/envelopes', (req, res, next) => {
 })
 
 
-/*Retrieve envelopes by name*/
-app.get('/envelopes/:name', (req, res, next) => {
-    const {name} = req.params;
-     if(!name){
-        return res.status(400).json({error: 'Must enter name of envelope to retrieve'});
-     }
+/*Retrieve envelopes by id*/
+app.get('/envelopes/:id', (req, res, next) => {
+    const {id} = req.params;
+     
+     const envelope = envelopes.find(env => env.id === Number(id));
 
-     const envelope = envelopes.find(env => env.name.toLowerCase() === name.toLowerCase());
+     //const envelope = envelopes.find(env => env.name.toLowerCase() === name.toLowerCase());
 
      if(!envelope){
-        return res.status(404).json({error: "No envelope by that name found"});
-     }
+        return res.status(404).json({error: "No envelope found"});
+     };
 
      res.status(200).json(envelope);
-})
+});
 
 
 
