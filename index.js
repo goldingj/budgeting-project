@@ -5,16 +5,6 @@ const PORT = 3000;
 app.use(express.json());
 
 const envelopes = [];
-let totalBudget = 0;
-
-/*Set budget*/
-app.post('/totalBudget', (req, res, next) => {
-    const{budget} = req.body;
-
-    totalBudget = budget;
-
-    res.status(200).json({totalBudget});
-});
 
 
 /* Create new envelopes */
@@ -103,6 +93,35 @@ app.delete("/envelopes/:name", (req, res, next) => {
 });
 
 
+/*Transfer balance from one envelope to another*/
+app.post('/envelopes/transfer/:fromId/:toId', (req, res, next) => {
+    const {fromId, toId} = req.params;
+    const {amount} = req.body;
+
+    const envelopeComingFrom = envelopes.find(env => env.id === Number(fromId));
+    const envelopeGoingTo = envelopes.find(env => env.id === Number(toId));
+
+    if(!envelopeComingFrom){
+        return res.status(404).json({error: "No envelope found to withdrawal from"});
+    }
+
+    if (!envelopeGoingTo){
+        return res.status(404).json({error: "No envelope to deposit to"});
+    }
+
+    if (typeof amount !== 'number' || amount < 0){
+        return res.status(404).json({error: "Valid number must be entered"});
+    }
+
+    if (envelopeComingFrom.amount <= amount){
+        return res.status(404).json({error: "Balance too low to withdrawal from"});
+    }
+
+    envelopeComingFrom.amount -= amount;
+    envelopeGoingTo.amount += amount;
+
+    return res.status(200).json({message: "Transfer complete"});
+})
 
 
 
