@@ -86,6 +86,21 @@ app.put("/envelopes/:id", (req, res, next) => {
 
 });
 
+/*Delete an Envelope*/
+
+app.delete("/envelopes/:name", (req, res, next) => {
+    const {name} = req.params;
+
+    const envelopeToDelete = envelopes.findIndex(env => env.name.toLowerCase() === name.toLowerCase());
+
+    if (envelopeToDelete === -1){
+        return res.status(404).json({error: "Envelope not found"});
+    }
+
+    const deletedEnvelope = envelopes.splice(envelopeToDelete , 1)[0];
+
+    return res.status(200).json({message: "Envelope deleted", deletedEnvelope});
+});
 
 
 
