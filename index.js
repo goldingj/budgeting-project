@@ -5,7 +5,16 @@ const PORT = 3000;
 app.use(express.json());
 
 const envelopes = [];
-const totalBudget = 0;
+let totalBudget = 0;
+
+/*Set budget*/
+app.post('/totalBudget', (req, res, next) => {
+    const{budget} = req.body;
+
+    totalBudget = budget;
+
+    res.status(200).json({totalBudget});
+});
 
 
 /* Create new envelopes */
@@ -39,13 +48,42 @@ app.get('/envelopes/:id', (req, res, next) => {
      
      const envelope = envelopes.find(env => env.id === Number(id));
 
-     //const envelope = envelopes.find(env => env.name.toLowerCase() === name.toLowerCase());
-
      if(!envelope){
         return res.status(404).json({error: "No envelope found"});
      };
 
      res.status(200).json(envelope);
+});
+
+/*Update specific envelopes*/
+app.put("/envelopes/:id", (req, res, next) => {
+    const {id} = req.params;
+    const {name, amount} = req.body;
+
+    const envelopeToUpdate = envelopes.find(env => env.id === Number(id));
+
+    if (name === undefined && amount === undefined){
+        return res.status(400).json({error: "Must enter a name and/or amount"});
+    }
+
+    if(!envelopeToUpdate){
+        return res.status(404).json({error: "Envelope not found"});
+    }
+
+    if (name !== undefined){
+        envelopeToUpdate.name = name;
+    }
+    if (amount !== undefined){
+        if(typeof amount != 'number' || amount < 0){
+            return res.status(400).json({error: "You must enter a number for the amount"});
+        }
+        
+        envelopeToUpdate.amount -= amount;
+    }
+
+    res.status(200).json({envelopeToUpdate});
+    
+
 });
 
 
